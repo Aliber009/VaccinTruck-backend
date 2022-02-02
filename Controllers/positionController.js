@@ -7,12 +7,12 @@ const PositionController={
  lastPosition:(req,res)=>{
     const ambulanceId=req.query.ambulanceId;
     Position.findOne({
-        attributes: ['lat' , 'lon'] ,
+        attributes: ['lat' , 'lng'] ,
         where:{
         ambulanceId:ambulanceId},
         order: [['createdAt', 'DESC']],
     })
-    .then(pos=>{res.json({success:true,currentposition:[parseFloat(pos.lat),parseFloat(pos.lon)]})})
+    .then(pos=>{res.json({success:true,currentposition:[parseFloat(pos.lat),parseFloat(pos.lng)]})})
     .catch(err=>{res.json({success:false,msg:err})})
 
  },   
@@ -23,7 +23,7 @@ const PositionController={
      const to=req.query.to; 
      try{
      const pos =await Position.findAll({
-        attributes: ['lat' , 'lon'] ,
+        attributes: ['lat' , 'lng'] ,
         where:{
         [Op.and]:[ 
         {ambulanceId:ambulanceId},

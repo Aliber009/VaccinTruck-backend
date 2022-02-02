@@ -10,7 +10,7 @@ const Position = sequelize.define('Position',
         type: DataTypes.STRING,
         allowNull: false,
       },
-      lon: {
+      lng: {
         type: DataTypes.STRING,
         allowNull: false,
       },

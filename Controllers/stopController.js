@@ -1,23 +1,29 @@
-const Stop =require('../models/stop');
+const Stop = require('../models/stop');
 const {Op}=require('sequelize');
 const Position = require('../models/position');
+const moment=require('moment');
 
 
 
 const stopController = {
    getStops:async (req,res)=>{
       try{
-        const Stops=Stop.findAll();
+        const DayTime=new Date();
+        const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(-1, 'days'));
+        console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
+        const Stops = await Stop.findAll({where:{
+          createdAt: { [Op.between]:[DayTime,DayTimePlusOne]} 
+          }});
         res.json({success:true,stops:Stops})
       }
-      catch{
-        res.json({success:true,msg:"error occuried"})
+      catch(err){
+        res.json({success:false,msg:err})
       }
    },
    create:async (req,res)=>{
    
-    const {AmbulanceId,lat,lon,rtls,vaccinated,address}=req.body;
-    const newStopQuery = {AmbulanceId:AmbulanceId,lat:lat,lon:lon,rtls:rtls,vaccinated:vaccinated,address:address} 
+    const { AmbulanceId,lat,lng,rtls,vaccinated,address } = req.body;
+    const newStopQuery = {AmbulanceId:AmbulanceId,lat:lat,lng:lng,rtls:rtls,vaccinated:vaccinated,address:address} 
     
     try
     {

@@ -4,5 +4,5 @@ const stopController=require('../Controllers/stopController')
 
 
 router.post('/create',stopController.create)
-
+router.get('/getstops',stopController.getStops)
 module.exports=router

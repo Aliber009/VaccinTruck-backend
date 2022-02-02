@@ -23,6 +23,7 @@
     "http": "0.0.1-security",
     "https": "^1.0.0",
     "jsonwebtoken": "^7.4.1",
+    "moment": "^2.29.1",
     "mongoose": "^5.9.9",
     "mongoose-title-case": "0.0.4",
     "mongoose-unique-validator": "^1.0.5",

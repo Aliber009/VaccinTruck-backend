@@ -9,7 +9,7 @@ const Ambulance = require('./ambulance');
         type: DataTypes.STRING,
         allowNull: false,
       },
-      lon: {
+      lng: {
         type: DataTypes.STRING,
         allowNull: false,
       },

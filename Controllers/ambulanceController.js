@@ -1,6 +1,9 @@
 const Ambulance = require('../models/ambulance');
 const  Position = require('../models/position');
 const Stop = require('../models/stop');
+const {Op}=require('sequelize');
+const moment=require('moment');
+
 
 
 const ambulanceController={
@@ -14,8 +17,8 @@ getAll:async function(req, res) {
       var Stops=[];
       for(var i=0;i<ambulances.length;i++){
       const LastPos=await Position.findOne({
-          attributes:['AmbulanceId','lat','lon','Attributes','gpsTime'],
-          where:{AmbulanceId:ambulances[i].id},
+          attributes:['AmbulanceId','lat','lng','Attributes','gpsTime'],
+          where:{AmbulanceId:ambulances[i].id, },
           order: [['createdAt', 'DESC']],
         })
         if( LastPos ){
@@ -31,6 +34,45 @@ getAll:async function(req, res) {
     }
     catch{
           res.json({success: false,msg:"error occuried"});
+        }
+        //here  we need to filter the devices according the user Role and return the value, meanwhile we just return every device  
+},
+getAllbyDay:async function(req, res) {
+    const {day}=req.body;
+    const DayTime=new Date(day);
+    const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(1, 'days'));
+   
+    console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
+    try{
+      const ambulances=await Ambulance.findAll();
+      //get device last positions:
+      var lastpos=[]
+      var Stops=[];
+      for(var i=0;i<ambulances.length;i++){
+      const LastPos=await Position.findOne({
+          attributes:['AmbulanceId','lat','lng','Attributes','gpsTime'],
+          where:{
+              AmbulanceId:ambulances[i].id,
+              gpsTimeFixed: { [Op.between]:[DayTime,DayTimePlusOne]} 
+         },
+          order: [['createdAt', 'DESC']],
+        })
+        if( LastPos ){
+        const poswithName={...LastPos.dataValues,AmbulanceName:ambulances[i].name}
+         lastpos.push(poswithName);
+        }
+       const ambulanceStop=await ambulances[i].getStops({
+           where:{
+               createdAt: { [Op.between]:[DayTime,DayTimePlusOne]} 
+            }});
+       if(ambulanceStop.length > 0 ){
+        Stops.push({id:ambulances[i].id, stops: ambulanceStop}); 
+       }
+      }
+      res.json({success: true, ambulances: ambulances,lastpos:lastpos, stops:Stops});
+    }
+    catch(err){
+          res.json({success: false,msg:"error occuried",err});
         }
         //here  we need to filter the devices according the user Role and return the value, meanwhile we just return every device  
 },

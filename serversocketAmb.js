@@ -34,7 +34,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
   var addStop=true
   try{
     const pos = await Position.findOne({
-       attributes: ['lat' , 'lon'] ,
+       attributes: ['lat' , 'lng'] ,
        where:{
        [Op.and]:[ 
        {AmbulanceId:ambulance.id},
@@ -47,7 +47,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
     });
     if(pos)
     {
-      if(Math.abs(pos.lat-latNow)<0.0002 && Math.abs(pos.lon-lonNow)<0.0002 ){
+      if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){
         const AmbulanceStopsToday = await ambulance.getStops({where: {
           createdAt: { 
             [Op.gt]: TODAY_START,
@@ -55,7 +55,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
           },
         }});
         for(var i=0;i<AmbulanceStopsToday.length;i++){
-          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0002 && Math.abs(AmbulanceStopsToday[i].lon-pos.lon)<0.0002)
+          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.0002)
           {
             addStop=false
           }
@@ -70,13 +70,6 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
   return addStop
 }
 
-
-
-
- 
-//Data should be stored in Db even the user is not connected but only updated if they're connected
-
-
      
      //consuming 
      eventEmitter.on("mqChannel", (channel)=>{
@@ -90,7 +83,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
         const gpsTimeFixed = new Date(jsonmsg.time*1000);
         const queries = {
           lat:jsonmsg.lat,
-          lon:jsonmsg.lng,
+          lng:jsonmsg.lng,
           AmbulanceId:ambulance.id,
           gpsTime:gpsTime,
           gpsTimeFixed:gpsTimeFixed,
@@ -104,7 +97,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
         if(checkStop(ambulance,jsonmsg.lat,jsonmsg.lng)==true){
          const Stopquery={
           lat:jsonmsg.lat,
-          lon:jsonmsg.lng, 
+          lng:jsonmsg.lng, 
           AmbulanceId:ambulance.id,
           vaccinated:0,
           address:await geocode(jsonmsg.lat,jsonmsg.lng) ,
