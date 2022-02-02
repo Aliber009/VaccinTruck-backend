@@ -1,0 +1,86 @@
+const Ambulance = require('../models/ambulance');
+const  Position = require('../models/position');
+const Stop = require('../models/stop');
+
+
+const ambulanceController={
+getAll:async function(req, res) {
+    
+
+    try{
+      const ambulances=await Ambulance.findAll();
+      //get device last positions:
+      var lastpos=[]
+      var Stops=[];
+      for(var i=0;i<ambulances.length;i++){
+      const LastPos=await Position.findOne({
+          attributes:['AmbulanceId','lat','lon','Attributes','gpsTime'],
+          where:{AmbulanceId:ambulances[i].id},
+          order: [['createdAt', 'DESC']],
+        })
+        if( LastPos ){
+        const poswithName={...LastPos.dataValues,AmbulanceName:ambulances[i].name}
+         lastpos.push(poswithName);
+        }
+       const ambulanceStop=await ambulances[i].getStops();
+       if(ambulanceStop.length > 0 ){
+        Stops.push({id:ambulances[i].id, stops: ambulanceStop}); 
+       }
+      }
+      res.json({success: true, ambulances: ambulances,lastpos:lastpos, stops:Stops});
+    }
+    catch{
+          res.json({success: false,msg:"error occuried"});
+        }
+        //here  we need to filter the devices according the user Role and return the value, meanwhile we just return every device  
+},
+
+
+create:async (req,res)=>{
+   
+    const {name,imei}=req.body;
+    const newAmbulance = {name:name,imei:imei} 
+    
+    try
+    {
+    const newdevice=await Ambulance.create(newDevice);
+    res.json({success:true,msg:"created",ambulanceId:newdevice.id})
+     }
+    catch(err)
+    {
+        console.log(err);res.json({success:false,msg:"failed"})
+    }
+},
+edit:(req,res)=>{
+    const {ambulanceId,name,imei}=req.body
+    Ambulance.findAll({ where: {id:ambulanceId}}).then((ambulance)=>{
+        if (ambulance.length == 1)
+         {
+             const newValues={name:name,imei:imei}
+             Ambulance.update(newValues,{where:{id: ambulance[0].id}})
+             .then(()=>{res.json({success: true,ambulanceId:ambulanceId})})
+             .catch(()=>{res.json({success: false, msg: 'There was an error. Please contract the administator'});})
+              
+         }
+        else
+            {
+              res.json({success: false});
+            }
+      })
+    },
+    delete:(req,res)=>{
+        const {ambulanceId}=req.body
+        Ambulance.findAll({ where: {id:ambulanceId}}).then((ambulance)=>{
+            if(ambulance.length == 1)
+            {
+               Ambulance.destroy({where:{id: ambulance[0].id}})
+               .then(()=>{ res.json({success: true,msg:"ambulance deleted succesfully",ambulanceId:ambulanceId});})
+               .catch(()=>{res.json({success: false, msg: 'There was an error. Please contract the administator'});})
+            }
+            else{
+                res.json({success: false});
+            }
+        })
+    }
+}
+module.exports=ambulanceController
