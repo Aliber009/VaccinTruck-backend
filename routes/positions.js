@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const PositionController=require('../Controllers/positionController')
 
-router.get('/replay',PositionController.replay)
-router.get('/lastposition',PositionController.lastPosition)
+router.get('/todayPositions',PositionController.todayPosition)
+router.post('/DayPositions',PositionController.positionByDay)
 
 module.exports=router
