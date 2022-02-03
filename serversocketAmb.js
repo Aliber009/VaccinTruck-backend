@@ -128,7 +128,20 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         } */
       }
       else{
-        const ambu = await Ambulance.create({name:serial,imei:serial})
+   const arrayData=[
+     {name:"Oulad azzouz",serial:"124158189232209108",immatricule:"225356j"},
+     {name:"Bouskoura",serial:"761717416365196",immatricule:"190162j"},
+     {name:"Nouaceur",serial:"12415818925449220",immatricule:"219852j"},
+     {name:"Oulad saleh",serial:"124158189232125208",immatricule:"211391j"},
+     {name:"Dar bouazza",serial:"12415818923323344",immatricule:"219849j"},
+      ];
+      for(var k=0;k<arrayData.length;k++){
+        if(serial==arrayData[i].serial){
+         const ambu = await Ambulance.create({name:arrayData[i].name,imei:serial,immatricule:arrayData[i].immatricule});
+         break;
+        }
+      }
+        
       }
       
         setTimeout(function() {

@@ -13,6 +13,11 @@ const sequelize=require('../config/sequelize')
         allowNull: false,
         unique: true,
       },
+      immatricule:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
       vaccinCount:{
         type: DataTypes.STRING,
         allowNull: true,
