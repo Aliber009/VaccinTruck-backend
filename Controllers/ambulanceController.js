@@ -34,7 +34,11 @@ getAll:async function(req, res) {
                   },
            }});
        if(ambulanceStop.length > 0 ){
-        Stops.push({id:ambulances[i].id, stops: ambulanceStop}); 
+         var totalVac=0;
+         for(var i=0;i<ambulanceStop.length;i++){
+            totalVac+=ambulanceStop[i].vaccinated;
+          }  
+        Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
        }
       }
       res.json({success: true, ambulances: ambulances,lastpos:lastpos, stops:Stops});

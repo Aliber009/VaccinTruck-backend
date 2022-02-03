@@ -8,13 +8,20 @@ const moment=require('moment');
 const stopController = {
    getStops:async (req,res)=>{
       try{
-        const DayTime=new Date();
-        const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(-1, 'days'));
+        const TODAY_START = new Date().setHours(0, 0, 0, 0);
+        const NOW = new Date();
+        var totalVac=0;
+        /* const DayTime=new Date();
+        const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(-1, 'days')); */
         console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
         const Stops = await Stop.findAll({where:{
-          createdAt: { [Op.between]:[DayTime,DayTimePlusOne]} 
+          createdAt: { [Op.between]:[TODAY_START,NOW]} 
           }});
-        res.json({success:true,stops:Stops})
+          //get total vaccinated:
+        for(var i=0;i<Stops.length;i++){
+          totalVac+=Stops[i].vaccinated;
+        }
+        res.json({success:true,stops:Stops, totalVaccinated:totalVac})
       }
       catch(err){
         res.json({success:false,msg:err})
