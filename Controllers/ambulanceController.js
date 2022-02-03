@@ -8,8 +8,9 @@ const moment=require('moment');
 
 const ambulanceController={
 getAll:async function(req, res) {
-    
 
+    const TODAY_START = new Date().setHours(0, 0, 0, 0);
+    const NOW = new Date();
     try{
       const ambulances=await Ambulance.findAll();
       //get device last positions:
@@ -25,7 +26,13 @@ getAll:async function(req, res) {
         const poswithName={...LastPos.dataValues,AmbulanceName:ambulances[i].name}
          lastpos.push(poswithName);
         }
-       const ambulanceStop=await ambulances[i].getStops();
+       const ambulanceStop=await ambulances[i].getStops(
+           {where:{
+                createdAt: { 
+                    [Op.gt]: TODAY_START,
+                    [Op.lt]: NOW
+                  },
+           }});
        if(ambulanceStop.length > 0 ){
         Stops.push({id:ambulances[i].id, stops: ambulanceStop}); 
        }

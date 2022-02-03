@@ -70,8 +70,42 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
   return addStop
 }
 
-     
-     //consuming 
+//Consuming Stop Events: The function gets fired every time we have a stop event
+const StopEvent = async(DataStop)=>{
+var isStop=false; 
+const TODAY_START = new Date().setHours(0, 0, 0, 0);
+const NOW = new Date();  
+// const DataStop  = {lat:"33.452",lng:"-5.42342",AmbulanceId:2}
+const ambulance = await Ambulance.findOne({where:{id:DataStop.AmbulanceId}})
+const AmbulanceStopsToday = await ambulance.getStops({where: {
+  createdAt: { 
+    [Op.gt]: TODAY_START,
+    [Op.lt]: NOW
+  },
+}});
+//Loop through today Stops:
+for(var i=0;i<AmbulanceStopsToday.length;i++){
+  if(Math.abs(AmbulanceStopsToday[i].lat-DataStop.lat)<0.0002 || Math.abs(AmbulanceStopsToday[i].lng-DataStop.lng)<0.0002)
+  {
+    await AmbulanceStopsToday[i].increment('vaccinated');
+    isStop=true;
+    break;
+  }
+}
+if(isStop==false){
+  const Stopquery={
+    lat:DataStop.lat,
+    lng:DataStop.lng, 
+    AmbulanceId:DataStop.AmbulanceId,
+    rtls:DataStop.rtls,
+    vaccinated:1,
+    address:await geocode(DataStop.lat,DataStop.lng) ,
+   }
+   const newStop = await Stop.create(Stopquery);
+ }
+}
+
+//consuming Rabbit Queue 
      eventEmitter.on("mqChannel", (channel)=>{
       channel.prefetch(1)
       channel.consume("http-queue", async (msg) => {
