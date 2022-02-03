@@ -25,7 +25,7 @@ const PositionController={
         });
         if(position.length>0)
         {
-        Pos.push({[ambulances[i].id]:position })
+        Pos.push({id:ambulances[i].id,positions:position })
         }
     }
     res.json({success:true,Positions:Pos})

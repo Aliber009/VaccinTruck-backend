@@ -119,7 +119,7 @@ if(ambulance){
        }   
      //Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
     }
-    res.json({ambulance:ambulance,TotalVaccin:totalVac,lastpos:{...LastPos.dataValues,address:address}})
+    res.json({ambulance:ambulance,TotalVaccin:totalVac,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
 }
 
 },

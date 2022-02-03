@@ -28,10 +28,11 @@ app.get('/', (req, res) => {
 // Check the stop function 
 
 
-const checkStop = async (ambulance,latNow,lonNow)=>{
+const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   const TODAY_START = new Date().setHours(0, 0, 0, 0);
   const NOW = new Date();  
   var addStop=true
+  
   try{
     const pos = await Position.findOne({
        attributes: ['lat' , 'lng'] ,
@@ -39,7 +40,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
        [Op.and]:[ 
        {AmbulanceId:ambulance.id},
        { gpsTimeFixed: {
-          [Op.lte]: Sequelize.literal("NOW() - (INTERVAL '20 MINUTE')"),}
+          [Op.lte]: Sequelize.literal("NOW() - (INTERVAL '10 MINUTE')"),}
         },
        ]
      },
@@ -47,6 +48,7 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
     });
     if(pos)
     {
+      //Check Stop by Time 
       if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){
         const AmbulanceStopsToday = await ambulance.getStops({where: {
           createdAt: { 
@@ -63,6 +65,21 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
         
       }
     }
+    //Check Stop by Vaccinated Count : 
+    if(ambulance.vaccinCount!=EventVaccinCount)
+    {
+      
+      await ambulance.update({vaccinCount:EventVaccinCount});
+      for(var i=0;i<AmbulanceStopsToday.length;i++){
+        if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.0002)
+        {
+          await ambulanceStopsToday[i].increment('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
+          addStop=false;
+          break;
+        }
+      }
+
+    }
   }
   catch(err){
     console.log("error in stop finder",err)
@@ -70,50 +87,19 @@ const checkStop = async (ambulance,latNow,lonNow)=>{
   return addStop
 }
 
-//Consuming Stop Events: The function gets fired every time we have a stop event
-const StopEvent = async(DataStop)=>{
-var isStop=false; 
-const TODAY_START = new Date().setHours(0, 0, 0, 0);
-const NOW = new Date();  
-// const DataStop  = {lat:"33.452",lng:"-5.42342",AmbulanceId:2}
-const ambulance = await Ambulance.findOne({where:{id:DataStop.AmbulanceId}})
-const AmbulanceStopsToday = await ambulance.getStops({where: {
-  createdAt: { 
-    [Op.gt]: TODAY_START,
-    [Op.lt]: NOW
-  },
-}});
-//Loop through today Stops:
-for(var i=0;i<AmbulanceStopsToday.length;i++){
-  if(Math.abs(AmbulanceStopsToday[i].lat-DataStop.lat)<0.0002 || Math.abs(AmbulanceStopsToday[i].lng-DataStop.lng)<0.0002)
-  {
-    await AmbulanceStopsToday[i].increment('vaccinated');
-    isStop=true;
-    break;
-  }
-}
-if(isStop==false){
-  const Stopquery={
-    lat:DataStop.lat,
-    lng:DataStop.lng, 
-    AmbulanceId:DataStop.AmbulanceId,
-    rtls:DataStop.rtls,
-    vaccinated:1,
-    address:await geocode(DataStop.lat,DataStop.lng) ,
-   }
-   const newStop = await Stop.create(Stopquery);
- }
-}
 
 //consuming Rabbit Queue 
      eventEmitter.on("mqChannel", (channel)=>{
       channel.prefetch(1)
-      channel.consume("http-queue", async (msg) => {
+      channel.consume("ambu", async (msg) => {
+        //get the message header 
+         const serial = msg.properties.headers.serial
          const jsonmsg=JSON.parse(msg.content.toString())
-         const ambulance=await Ambulance.findOne({where:{imei:jsonmsg.serial}})
+         
+         const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
         //Here we are sending the positions only 
-        const gpsTime = new Date(jsonmsg.time*1000).toISOString();
+        /* const gpsTime = new Date(jsonmsg.time*1000).toISOString();
         const gpsTimeFixed = new Date(jsonmsg.time*1000);
         const queries = {
           lat:jsonmsg.lat,
@@ -127,19 +113,22 @@ if(isStop==false){
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
-        
+        var craeteStopwithCount = EventVaccinCount - ambulance.vaccinCount ;
         if(checkStop(ambulance,jsonmsg.lat,jsonmsg.lng)==true){
          const Stopquery={
           lat:jsonmsg.lat,
           lng:jsonmsg.lng, 
           AmbulanceId:ambulance.id,
-          vaccinated:0,
+          vaccinated:craeteStopwithCount ,
           address:await geocode(jsonmsg.lat,jsonmsg.lng) ,
          }
          console.log("new Stop, ",Stopquery)
          const newStop = await Stop.create(Stopquery);
          io.emit('stopUpdate',newStop);
-        }
+        } */
+      }
+      else{
+        const ambu = await Ambulance.create({name:serial,imei:serial})
       }
       
         setTimeout(function() {
