@@ -3,7 +3,7 @@ const  Position = require('../models/position');
 const Stop = require('../models/stop');
 const {Op}=require('sequelize');
 const moment=require('moment');
-
+const geocode=require('../services/geocoder')
 
 
 const ambulanceController={
@@ -88,7 +88,41 @@ getAllbyDay:async function(req, res) {
         //here  we need to filter the devices according the user Role and return the value, meanwhile we just return every device  
 },
 
+getbyId:async(req,res)=>{
+const id = req.query.id;
+const TODAY_START = new Date().setHours(0, 0, 0, 0);
+const NOW = new Date();
+const ambulance = await Ambulance.findOne({ where: { id: id } });
+if(ambulance){
+    //get last pos :
+    const LastPos=await Position.findOne({
+        attributes:['AmbulanceId','lat','lng','Attributes','gpsTime'],
+        where:{
+            AmbulanceId:ambulance.id, 
+       },
+        order: [['createdAt', 'DESC']],
+      });
+      const address=await geocode(LastPos.lat,LastPos.lng);
+      //get Stops of ambulance:
+      const ambulanceStop=await ambulance.getStops(
+        {where:{
+             createdAt: { 
+                 [Op.gt]: TODAY_START,
+                 [Op.lt]: NOW
+               },
+        }});
+      var totalVac=0;
+      if(ambulanceStop.length > 0 ){
+      
+      for(var j=0;j<ambulanceStop.length;j++){
+         totalVac+=ambulanceStop[j].vaccinated;
+       }   
+     //Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
+    }
+    res.json({ambulance:ambulance,TotalVaccin:totalVac,lastpos:{...LastPos.dataValues,address:address}})
+}
 
+},
 create:async (req,res)=>{
    
     const {name,imei}=req.body;
