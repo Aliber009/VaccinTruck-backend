@@ -35,9 +35,9 @@ getAll:async function(req, res) {
            }});
        if(ambulanceStop.length > 0 ){
          var totalVac=0;
-         for(var i=0;i<ambulanceStop.length;i++){
-            totalVac+=ambulanceStop[i].vaccinated;
-          }  
+         for(var j=0;j<ambulanceStop.length;j++){
+            totalVac+=ambulanceStop[j].vaccinated;
+          }   
         Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
        }
       }

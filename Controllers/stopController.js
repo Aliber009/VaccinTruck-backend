@@ -13,7 +13,7 @@ const stopController = {
         var totalVac=0;
         /* const DayTime=new Date();
         const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(-1, 'days')); */
-        console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
+        //console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
         const Stops = await Stop.findAll({where:{
           createdAt: { [Op.between]:[TODAY_START,NOW]} 
           }});
