@@ -107,20 +107,20 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           AmbulanceId:ambulance.id,
           gpsTime:gpsTime,
           gpsTimeFixed:gpsTimeFixed,
-          Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temp ,speed:jsonmsg.gpsPayload.speed })
+          Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
         } 
         const pos=await Position.create(queries) ;
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
-        var craeteStopwithCount = EventVaccinCount - ambulance.vaccinCount ;
-        if(checkStop(ambulance,jsonmsg.lat,jsonmsg.lng)==true){
+        var craeteStopwithCount = jsonmsg.vaccin_count - ambulance.vaccinCount ;
+        if(checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)==true){
          const Stopquery={
-          lat:jsonmsg.lat,
-          lng:jsonmsg.lng, 
+          lat:jsonmsg.gpsPayload.latitude,
+          lng:jsonmsg.gpsPayload.longitude, 
           AmbulanceId:ambulance.id,
           vaccinated:craeteStopwithCount ,
-          address:await geocode(jsonmsg.lat,jsonmsg.lng) ,
+          address:await geocode(jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude) ,
          }
          console.log("new Stop, ",Stopquery)
          const newStop = await Stop.create(Stopquery);
@@ -136,8 +136,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      {name:"Dar bouazza",serial:"12415818923323344",immatricule:"219849j"},
       ];
       for(var k=0;k<arrayData.length;k++){
-        if(serial==arrayData[i].serial){
-         const ambu = await Ambulance.create({name:arrayData[i].name,imei:serial,immatricule:arrayData[i].immatricule});
+        if(serial==arrayData[k].serial){
+         const ambu = await Ambulance.create({name:arrayData[i].name,imei:serial,immatricule:arrayData[k].immatricule});
          break;
         }
       }
