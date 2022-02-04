@@ -121,7 +121,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         break;
       }
     }
-    if(StopExist!=false)
+    if(StopExist==false)
     {
       const craeteStopwithCount = EventVaccinCount-ambulance.vaccinCount;
       const Stopquery={
