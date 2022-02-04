@@ -34,11 +34,11 @@ getAll:async function(req, res) {
                   },
            }});
        if(ambulanceStop.length > 0 ){
-         var totalVac=0;
+         /* var totalVac=0;
          for(var j=0;j<ambulanceStop.length;j++){
             totalVac+=ambulanceStop[j].vaccinated;
-          }   
-        Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
+          } */   
+        Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:ambulances[i].vaccinCount}); 
        }
       }
       res.json({success: true, ambulances: ambulances,lastpos:lastpos, stops:Stops});
@@ -69,12 +69,15 @@ getAllbyDay:async function(req, res) {
           order: [['createdAt', 'DESC']],
         })
         if( LastPos ){
-        const poswithName={...LastPos.dataValues,AmbulanceName:ambulances[i].name}
+         const poswithName={...LastPos.dataValues,AmbulanceName:ambulances[i].name}
          lastpos.push(poswithName);
         }
        const ambulanceStop=await ambulances[i].getStops({
            where:{
-               createdAt: { [Op.between]:[DayTime,DayTimePlusOne]} 
+            createdAt: { 
+              [Op.gt]: TODAY_START,
+              [Op.lt]: NOW
+            },
             }});
        if(ambulanceStop.length > 0 ){
         Stops.push({id:ambulances[i].id, stops: ambulanceStop}); 
