@@ -114,8 +114,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   {
     var StopExist=false;
     for(var i=0;i<AmbulanceStopsToday.length;i++){
-      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.002)
+      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.0005)
       {
+        console.log('increment!')
         await AmbulanceStopsToday[i].increment('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
         StopExist=true;
         break;
@@ -131,7 +132,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       vaccinated:craeteStopwithCount ,
       address:await geocode(latNow,lonNow) ,
      }
-     console.log("new Stop, ",Stopquery)
+     console.log("new Stop by diff  ")
      const newStop = await Stop.create(Stopquery);
      io.emit('stopUpdate',newStop);
     }
@@ -152,9 +153,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       });
       if(pos)
       { 
-      if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){ 
+      if(Math.abs(pos.lat-latNow)<0.0003 || Math.abs(pos.lng-lonNow)<0.0003 ){ 
       for(var i=0;i<AmbulanceStopsToday.length;i++){
-          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.002)
+          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.0005)
           {
             addStop=false;
             break;
@@ -165,9 +166,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
             lat:latNow,
             lng:lonNow, 
             AmbulanceId:ambulance.id,
-            vaccinated:ambulance.vaccinCount ,
+            vaccinated:0 ,
             address:await geocode(latNow,lonNow) ,
-           }
+           };
+           console.log('new Stop by time!')
            const newStop = await Stop.create(Stopquery);
            io.emit('stopUpdate',newStop);
         }
@@ -220,11 +222,11 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
         }
        } 
-      const pos=await Position.create(queries) ;
+        const pos=await Position.create(queries) ;
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
-        checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)
+       checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)
          
       }
       else{
@@ -251,7 +253,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         setTimeout(function() {
           console.log(" [x] Done");
           channel.ack(msg);
-        }, 500);
+        }, 50);
     }, {
     noAck: false
   });
