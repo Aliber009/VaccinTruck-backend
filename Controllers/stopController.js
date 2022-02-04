@@ -27,6 +27,13 @@ const stopController = {
         res.json({success:false,msg:err})
       }
    },
+   increment:async(req,res)=>{
+     const {stopId}=req.body;
+     const stop = await Stop.findOne({where:{id:stopId}});
+     await stop.increment("vaccinated",{by:1});
+     res.json({stop:stop})
+   },
+
    create:async (req,res)=>{
    
     const { AmbulanceId,lat,lng,rtls,vaccinated,address } = req.body;

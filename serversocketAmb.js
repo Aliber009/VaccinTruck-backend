@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 // Check the stop function 
 
 
-const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
+/* const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   const TODAY_START = new Date().setHours(0, 0, 0, 0);
   const NOW = new Date();  
   var addStop=true
@@ -93,7 +93,93 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   catch(err){
   console.log("error in stop finder",err)
   }   
+} */
+
+
+//Optimized function to check Stop:
+const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
+  try{
+  const TODAY_START = new Date().setHours(0, 0, 0, 0);
+  const NOW = new Date();  
+  var addStop=true
+  //get all stops today
+  const AmbulanceStopsToday = await ambulance.getStops({where: {
+    createdAt: { 
+      [Op.gt]: TODAY_START,
+      [Op.lt]: NOW
+    },
+  }});
+  //Check Stop by Vaccinated Count : 
+  if(ambulance.vaccinCount!=EventVaccinCount)
+  {
+    var StopExist=false;
+    for(var i=0;i<AmbulanceStopsToday.length;i++){
+      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.002)
+      {
+        await AmbulanceStopsToday[i].increment('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
+        StopExist=true;
+        break;
+      }
+    }
+    if(StopExist!=false)
+    {
+      const craeteStopwithCount = EventVaccinCount-ambulance.vaccinCount;
+      const Stopquery={
+      lat:latNow,
+      lng:lonNow, 
+      AmbulanceId:ambulance.id,
+      vaccinated:craeteStopwithCount ,
+      address:await geocode(latNow,lonNow) ,
+     }
+     console.log("new Stop, ",Stopquery)
+     const newStop = await Stop.create(Stopquery);
+     io.emit('stopUpdate',newStop);
+    }
+    //update albulance : 
+    await ambulance.update({vaccinCount:EventVaccinCount});
+  }
+  else{
+      var addStop=false; 
+    //check Stop by time and position approx
+      const pos = await Position.findOne({
+      attributes: ['lat' , 'lng'] ,
+      where:{ 
+      AmbulanceId:ambulance.id},
+      createdAt: {
+        [Op.lte]: Sequelize.literal("NOW() - (INTERVAL '10 MINUTE')")
+      },
+      order: [['createdAt', 'DESC']],
+      });
+      if(pos)
+      { 
+      if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){ 
+      for(var i=0;i<AmbulanceStopsToday.length;i++){
+          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.002)
+          {
+            addStop=false;
+            break;
+          }
+        }
+        if( addStop == true){
+          const Stopquery={
+            lat:latNow,
+            lng:lonNow, 
+            AmbulanceId:ambulance.id,
+            vaccinated:ambulance.vaccinCount ,
+            address:await geocode(latNow,lonNow) ,
+           }
+           const newStop = await Stop.create(Stopquery);
+           io.emit('stopUpdate',newStop);
+        }
+      }
+    }
+  }
+ }
+ catch{
+   console.log("error in stop finder")
+ }
 }
+
 
 
 //consuming Rabbit Queue 
