@@ -39,12 +39,12 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
        where:{
        [Op.and]:[ 
        {AmbulanceId:ambulance.id},
-       { gpsTimeFixed: {
+       { createdAt: {
           [Op.lte]: Sequelize.literal("NOW() - (INTERVAL '10 MINUTE')"),}
         },
        ]
      },
-     order: [['createdAt', 'ASC']],
+     order: [['createdAt', 'DESC']],
     });
     const AmbulanceStopsToday = await ambulance.getStops({where: {
       createdAt: { 
@@ -54,6 +54,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     }});
     if(pos)
     {
+      
       //Check Stop by Time 
       if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){
         
