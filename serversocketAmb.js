@@ -138,7 +138,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       for(var k=0;k<arrayData.length;k++){
         if(serial==arrayData[k].serial){
          const ambu = await Ambulance.create({
-           name:arrayData[i].name,
+           name:arrayData[k].name,
            imei:serial,
            immatricule:arrayData[k].immatricule,
            vaccinCount:jsonmsg.vaccin_count,
