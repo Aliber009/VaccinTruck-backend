@@ -96,7 +96,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
          const serial = msg.properties.headers.serial
          const jsonmsg=JSON.parse(msg.content.toString())
          
-         const ambulance=await Ambulance.findOne({where:{imei:serial}})
+         if(jsonmsg.gpsPayload.latitude && jsonmsg.gpsPayload.longitude ){
+        const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
         //Here we are sending the positions only 
          const gpsTime = new Date().toISOString();
@@ -145,10 +146,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           });
          break;
         }
+      }  
       }
-        
-      }
-      
+    }
         setTimeout(function() {
           console.log(" [x] Done");
           channel.ack(msg);
