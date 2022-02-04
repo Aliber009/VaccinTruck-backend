@@ -100,13 +100,14 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
          if(jsonmsg.gpsPayload.latitude && jsonmsg.gpsPayload.longitude ){
         const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
-        //Here we are sending the positions only 
+        //Here we are sending the positions only
+        var queries = {} 
          const gpsTime = new Date().toISOString();
          const lastPositionInQueue = Position.findOne({where:{AmbulanceId:ambulance.id},order: [['createdAt', 'DESC']]});
         if(Math.abs(jsonmsg.gpsPayload.latitude-lastPositionInQueue.lat)<0.0002 || Math.abs(jsonmsg.gpsPayload.longitude-lastPositionInQueue.lng)<0.0002)
         {
         const gpsTimeFixed = new Date();
-        const queries = {
+         queries = {
           lat:lastPositionInQueue.lat,
           lng:lastPositionInQueue.lon,
           AmbulanceId:ambulance.id,
@@ -114,11 +115,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           gpsTimeFixed:gpsTimeFixed,
           Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
         }
-        const pos=await Position.create(queries) ;
       }
       else{
         const gpsTimeFixed = new Date();
-        const queries = {
+          queries = {
           lat:jsonmsg.gpsPayload.latitude,
           lng:jsonmsg.gpsPayload.longitude,
           AmbulanceId:ambulance.id,
@@ -126,9 +126,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           gpsTimeFixed:gpsTimeFixed,
           Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
         }
-        const pos=await Position.create(queries) ;
-      } 
-       
+       } 
+      const pos=await Position.create(queries) ;
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
