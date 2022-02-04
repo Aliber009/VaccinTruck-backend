@@ -102,6 +102,21 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         if(ambulance){
         //Here we are sending the positions only 
          const gpsTime = new Date().toISOString();
+         const lastPositionInQueue = Position.findOne({where:{AmbulanceId:ambulance.id},order: [['createdAt', 'DESC']]});
+        if(Math.abs(jsonmsg.gpsPayload.latitude-lastPositionInQueue.lat)<0.0002 || Math.abs(jsonmsg.gpsPayload.longitude-lastPositionInQueue.lng)<0.0002)
+        {
+        const gpsTimeFixed = new Date();
+        const queries = {
+          lat:lastPositionInQueue.lat,
+          lng:lastPositionInQueue.lon,
+          AmbulanceId:ambulance.id,
+          gpsTime:gpsTime,
+          gpsTimeFixed:gpsTimeFixed,
+          Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
+        }
+        const pos=await Position.create(queries) ;
+      }
+      else{
         const gpsTimeFixed = new Date();
         const queries = {
           lat:jsonmsg.gpsPayload.latitude,
@@ -110,8 +125,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
           gpsTime:gpsTime,
           gpsTimeFixed:gpsTimeFixed,
           Attributes:JSON.stringify({deviceCount:jsonmsg.deviceCount , vaccinTemperature:jsonmsg.vac_temperature ,speed:jsonmsg.gpsPayload.speed })
-        } 
+        }
         const pos=await Position.create(queries) ;
+      } 
+       
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
