@@ -64,17 +64,15 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     //Check Stop by Vaccinated Count : 
     if(ambulance.vaccinCount!=EventVaccinCount)
     {
-      
-      await ambulance.update({vaccinCount:EventVaccinCount});
       for(var i=0;i<AmbulanceStopsToday.length;i++){
         if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.002)
         {
-          await AmbulanceStopsToday[i].increment('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
+          await AmbulanceStopsToday[i].update('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
           addStop=false;
           break;
         }
       }
-
+      await ambulance.update({vaccinCount:EventVaccinCount});
     }
   if(addStop==true){
     const craeteStopwithCount = EventVaccinCount-ambulance.vaccinCount;
