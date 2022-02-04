@@ -46,16 +46,17 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      },
      order: [['createdAt', 'ASC']],
     });
+    const AmbulanceStopsToday = await ambulance.getStops({where: {
+      createdAt: { 
+        [Op.gt]: TODAY_START,
+        [Op.lt]: NOW
+      },
+    }});
     if(pos)
     {
       //Check Stop by Time 
       if(Math.abs(pos.lat-latNow)<0.0002 || Math.abs(pos.lng-lonNow)<0.0002 ){
-        const AmbulanceStopsToday = await ambulance.getStops({where: {
-          createdAt: { 
-            [Op.gt]: TODAY_START,
-            [Op.lt]: NOW
-          },
-        }});
+        
         for(var i=0;i<AmbulanceStopsToday.length;i++){
           if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0002 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.0002)
           {
