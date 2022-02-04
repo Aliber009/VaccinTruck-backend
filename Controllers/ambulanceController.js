@@ -111,15 +111,9 @@ if(ambulance){
                  [Op.lt]: NOW
                },
         }});
-      var totalVac=0;
-      if(ambulanceStop.length > 0 ){
+    
       
-      for(var j=0;j<ambulanceStop.length;j++){
-         totalVac+=ambulanceStop[j].vaccinated;
-       }   
-     //Stops.push({id:ambulances[i].id, stops: ambulanceStop,totalVaccinated:totalVac}); 
-    }
-    res.json({ambulance:ambulance,TotalVaccin:totalVac,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
+    res.json({ambulance:ambulance,TotalVaccin:ambulance.vaccinCount,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
 }
 
 },
