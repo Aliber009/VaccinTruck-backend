@@ -20,6 +20,7 @@ const Ambulance = require('./ambulance');
       vaccinated:{
         type: DataTypes.INTEGER,
         allowNull: true,
+        defaultValue:0,
       },
       address:{
         type: DataTypes.STRING,
