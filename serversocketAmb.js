@@ -26,8 +26,8 @@ app.get('/', (req, res) => {
 
 //Const Add One and Unique Stop in a given position with a radius Tolerance in a period of time in 1 day
 // Check the stop function 
-
-
+  
+  
 /* const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   const TODAY_START = new Date().setHours(0, 0, 0, 0);
   const NOW = new Date();  
@@ -140,27 +140,39 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     await ambulance.update({vaccinCount:EventVaccinCount});
   }
   else{
-      var addStop=false; 
+      var addStop=true; 
+      const NOW = new Date();
+      const Now_delay = new Date(NOW.setMinutes(NOW.getMinutes() - 5))
     //check Stop by time and position approx
-      const pos = await Position.findOne({
+      const pos = await Position.findAll({
       attributes: ['lat' , 'lng'] ,
       where:{ 
-      AmbulanceId:ambulance.id},
+      AmbulanceId:ambulance.id,
       createdAt: {
-        [Op.lte]: Sequelize.literal("NOW() - (INTERVAL '10 MINUTE')")
-      },
+        [Op.gt]: Now_delay ,
+        [Op.lt]:new Date() ,
+      }},
       order: [['createdAt', 'DESC']],
       });
-      if(pos)
+      if(pos.length>0)
       { 
-      if(Math.abs(pos.lat-latNow)<0.0003 || Math.abs(pos.lng-lonNow)<0.0003 ){ 
-      for(var i=0;i<AmbulanceStopsToday.length;i++){
-          if(Math.abs(AmbulanceStopsToday[i].lat-pos.lat)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-pos.lng)<0.0005)
+      for( var p=0 ;p<pos.length;p++){
+        if(Math.abs(pos[p].lat-latNow)>0.0006 || Math.abs(pos[p].lng-lonNow)>0.0006 ){
+          addStop=false;
+          break;
+        }  
+      }
+      }
+      if(addStop==true){
+        for(var i=0;i<AmbulanceStopsToday.length;i++){
+          if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.0005)
           {
             addStop=false;
             break;
           }
         }
+      }
+      
         if( addStop == true){
           const Stopquery={
             lat:latNow,
@@ -175,8 +187,6 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         }
       }
     }
-  }
- }
  catch{
    console.log("error in stop finder")
  }

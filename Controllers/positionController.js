@@ -3,6 +3,7 @@ const Position = require('../models/position');
 const {Op}=require('sequelize');
 const Ambulance = require('../models/ambulance');
 const moment=require('moment');
+const Sequelize =require('sequelize')
 
 const PositionController={
   
@@ -33,9 +34,21 @@ const PositionController={
   catch{
     res.json({success:false,Positions:"error"})
   }   
- },   
+ }, 
+ testPos:(req,res) =>{
+  const NOW = new Date();
+  const Now_delay = new Date(NOW.setMinutes(NOW.getMinutes() - 5))
+  Position.findAll({
+  attributes: ['lat' , 'lng','createdAt'] ,
+  where:{ 
+  AmbulanceId:1,
+  createdAt: {
+    [Op.lt]: Sequelize.literal("NOW() - (INTERVAL '3 MINUTE')")
+  }},
+  order: [['createdAt', 'DESC']],
+  }).then(pos=>{res.json({time:"time is : "+Now_delay+"  next: "+new Date() ,pos:pos})});
+ }, 
  positionByDay:async (req,res)=>{
-
     const {day}=req.body;
     const DayTime=new Date(day);
     const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(1, 'days'));
