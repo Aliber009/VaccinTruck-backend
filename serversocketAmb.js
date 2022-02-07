@@ -110,11 +110,11 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     },
   }});
   //Check Stop by Vaccinated Count : 
-  if(ambulance.vaccinCount!=EventVaccinCount)
+  if(ambulance.vaccinCount<EventVaccinCount)
   {
     var StopExist=false;
     for(var i=0;i<AmbulanceStopsToday.length;i++){
-      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.0005)
+      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.001 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.001)
       {
         console.log('increment!')
         await AmbulanceStopsToday[i].increment('vaccinated',{by:Math.abs(EventVaccinCount-ambulance.vaccinCount)});
@@ -139,6 +139,23 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     //update albulance : 
     await ambulance.update({vaccinCount:EventVaccinCount});
   }
+  //counter reseted
+  else if(ambulance.vaccinCount > EventVaccinCount){
+    //create default stop for first data 
+    const Stopquery={
+      lat:latNow,
+      lng:lonNow, 
+      AmbulanceId:ambulance.id,
+      vaccinated:EventVaccinCount ,
+      address:await geocode(latNow,lonNow) ,
+     };
+     console.log('new Stop by reset!')
+     const newStop = await Stop.create(Stopquery);
+     io.emit('stopUpdate',newStop);
+
+    //update albulance : 
+    await ambulance.update({vaccinCount:EventVaccinCount + ambulance.vaccinCount  });
+  }
   else{
       var addStop=true; 
       const NOW = new Date();
@@ -157,7 +174,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       if(pos.length>0)
       { 
       for( var p=0 ;p<pos.length;p++){
-        if(Math.abs(pos[p].lat-latNow)>0.0006 || Math.abs(pos[p].lng-lonNow)>0.0006 ){
+        if(Math.abs(pos[p].lat-latNow)>0.001 || Math.abs(pos[p].lng-lonNow)>0.001 ){
           addStop=false;
           break;
         }  
@@ -165,7 +182,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       }
       if(addStop==true){
         for(var i=0;i<AmbulanceStopsToday.length;i++){
-          if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.0005)
+          if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.001 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.001)
           {
             addStop=false;
             break;
