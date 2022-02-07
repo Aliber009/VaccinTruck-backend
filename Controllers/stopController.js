@@ -38,7 +38,8 @@ const stopController = {
     const TODAY_START = new Date().setHours(0, 0, 0, 0);
     const NOW = new Date();
     try{
-    const Stops = await Stop.detroy({where:{
+      
+    const Stops = await Stop.destroy({where:{
       createdAt: { [Op.between]:[TODAY_START,NOW]} 
       }});
       res.json({stop:"deleted success"})
