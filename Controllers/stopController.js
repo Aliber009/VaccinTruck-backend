@@ -11,6 +11,7 @@ const stopController = {
         const TODAY_START = new Date().setHours(0, 0, 0, 0);
         const NOW = new Date();
         var totalVac=0;
+        console.log('today,'+TODAY_START+"now: "+NOW)
         /* const DayTime=new Date();
         const DayTimePlusOne = new Date(moment(DayTime, "DD-MM-YYYY").add(-1, 'days')); */
         //console.log("days: "+DayTime+ " next: "+DayTimePlusOne )
@@ -33,9 +34,20 @@ const stopController = {
      await stop.increment("vaccinated",{by:1});
      res.json({stop:stop})
    },
-
+   deleteTodayStops:async(req,res)=>{
+    const TODAY_START = new Date().setHours(0, 0, 0, 0);
+    const NOW = new Date();
+    try{
+    const Stops = await Stop.detroy({where:{
+      createdAt: { [Op.between]:[TODAY_START,NOW]} 
+      }});
+      res.json({stop:"deleted success"})
+    }
+    catch{
+      res.json({stop:"deleted error"})
+    }
+   },
    create:async (req,res)=>{
-   
     const { AmbulanceId,lat,lng,rtls,vaccinated,address } = req.body;
     const newStopQuery = {AmbulanceId:AmbulanceId,lat:lat,lng:lng,rtls:rtls,vaccinated:vaccinated,address:address} 
     

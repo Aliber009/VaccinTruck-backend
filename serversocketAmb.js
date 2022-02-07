@@ -117,7 +117,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.0005 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.0005)
       {
         console.log('increment!')
-        await AmbulanceStopsToday[i].increment('vaccinated',{by:EventVaccinCount-ambulance.vaccinCount});
+        await AmbulanceStopsToday[i].increment('vaccinated',{by:Math.abs(EventVaccinCount-ambulance.vaccinCount)});
         StopExist=true;
         break;
       }

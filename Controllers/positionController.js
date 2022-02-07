@@ -3,7 +3,6 @@ const Position = require('../models/position');
 const {Op}=require('sequelize');
 const Ambulance = require('../models/ambulance');
 const moment=require('moment');
-const Sequelize =require('sequelize')
 
 const PositionController={
   
@@ -43,7 +42,8 @@ const PositionController={
   where:{ 
   AmbulanceId:1,
   createdAt: {
-    [Op.lt]: Sequelize.literal("NOW() - (INTERVAL '3 MINUTE')")
+    [Op.gt]: Now_delay ,
+    [Op.lt]:new Date() ,
   }},
   order: [['createdAt', 'DESC']],
   }).then(pos=>{res.json({time:"time is : "+Now_delay+"  next: "+new Date() ,pos:pos})});
