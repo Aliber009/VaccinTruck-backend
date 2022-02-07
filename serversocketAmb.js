@@ -144,6 +144,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   }
   //counter reseted
   else if(ambulance.vaccinCount > EventVaccinCount){
+    //update ambulance : 
+    const newresetCount = parseInt(EventVaccinCount) + parseInt(ambulance.vaccinCountTotal)
+    await ambulance.update({vaccinCount: EventVaccinCount, vaccinCountTotal:newresetCount });
+
     //create default stop for first data 
     const Stopquery={
       lat:latNow,
@@ -156,9 +160,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      const newStop = await Stop.create(Stopquery);
      io.emit('stopUpdate',newStop);
 
-    //update ambulance : 
-    const newresetCount = parseInt(EventVaccinCount) + parseInt(ambulance.vaccinCount)
-    await ambulance.update({vaccinCount: EventVaccinCount,vaccinCountTotal:newresetCount });
+    
   }
   else{
       var addStop=true; 

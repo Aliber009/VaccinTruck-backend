@@ -116,7 +116,7 @@ if(ambulance){
         }});
     
       
-    res.json({ambulance:ambulance,TotalVaccin:ambulance.vaccinCount,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
+    res.json({ambulance:ambulance,TotalVaccinGlobal:ambulance.vaccinCountTotal,TotalVaccin:ambulance.vaccinCount,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
 }
 
 },
