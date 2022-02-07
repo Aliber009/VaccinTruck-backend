@@ -154,7 +154,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      io.emit('stopUpdate',newStop);
 
     //update albulance : 
-    await ambulance.update({vaccinCount:EventVaccinCount + ambulance.vaccinCount  });
+    await ambulance.update({vaccinCount:parseInt(EventVaccinCount) + parseInt( ambulance.vaccinCount)  });
   }
   else{
       var addStop=true; 
