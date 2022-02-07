@@ -1,4 +1,5 @@
 const sequelize=require('../config/sequelize')
+const Sequelize = require("sequelize")
  const { DataTypes } = require('sequelize');
 
   const Ambulance = sequelize.define(
@@ -22,9 +23,14 @@ const sequelize=require('../config/sequelize')
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue:"0"
+      },
+      vaccinCountTotal:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue:  "0",
       }
 
 })
 
-Ambulance.sync()
+Ambulance.sync({alter:true})
 module.exports=Ambulance

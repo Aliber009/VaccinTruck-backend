@@ -110,6 +110,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     },
   }});
   //Check Stop by Vaccinated Count : 
+ /*  if(ambulance.vaccinCount!=ambulance.vaccinCountTotal){
+    //await ambulance.update({vaccinCountTotal:ambulance.vaccinCount });
+  } */
   if(ambulance.vaccinCount<EventVaccinCount)
   {
     var StopExist=false;
@@ -136,8 +139,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      const newStop = await Stop.create(Stopquery);
      io.emit('stopUpdate',newStop);
     }
-    //update albulance : 
-    await ambulance.update({vaccinCount:EventVaccinCount});
+    //update ambulance : 
+    await ambulance.update({vaccinCount:EventVaccinCount,vaccinCountTotal:parseInt(ambulance.vaccinCountTotal)+(parseInt(EventVaccinCount)-parseInt(ambulance.vaccinCount))});
   }
   //counter reseted
   else if(ambulance.vaccinCount > EventVaccinCount){
@@ -153,8 +156,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      const newStop = await Stop.create(Stopquery);
      io.emit('stopUpdate',newStop);
 
-    //update albulance : 
-    await ambulance.update({vaccinCount:parseInt(EventVaccinCount) + parseInt( ambulance.vaccinCount)  });
+    //update ambulance : 
+    const newresetCount = parseInt(EventVaccinCount) + parseInt(ambulance.vaccinCount)
+    await ambulance.update({vaccinCount: EventVaccinCount,vaccinCountTotal:newresetCount });
   }
   else{
       var addStop=true; 
