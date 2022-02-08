@@ -152,7 +152,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     for(var i=0;i<AmbulanceStopsToday.length;i++){
       if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.001 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.001)
       {
+        const newStop = await AmbulanceStopsToday[i].update({vaccinated:EventVaccinCounts});
         addStopReset=false;
+        io.emit('stopUpdate',newStop);
+        
       }
     }
     //create default stop for first data 
