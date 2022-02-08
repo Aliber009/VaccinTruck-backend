@@ -141,14 +141,22 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     }
     //update ambulance : 
     await ambulance.update({vaccinCount:EventVaccinCount,vaccinCountTotal:parseInt(ambulance.vaccinCountTotal)+(parseInt(EventVaccinCount)-parseInt(ambulance.vaccinCount))});
+    return;
   }
   //counter reseted
-  else if(ambulance.vaccinCount > EventVaccinCount){
+   else if(ambulance.vaccinCount > EventVaccinCount){
     //update ambulance : 
+    var addStopReset=true;
     const newresetCount = parseInt(EventVaccinCount) + parseInt(ambulance.vaccinCountTotal)
     await ambulance.update({vaccinCount: EventVaccinCount, vaccinCountTotal:newresetCount });
-
+    for(var i=0;i<AmbulanceStopsToday.length;i++){
+      if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.001 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.001)
+      {
+        addStopReset=false;
+      }
+    }
     //create default stop for first data 
+    if(addStopReset==true){
     const Stopquery={
       lat:latNow,
       lng:lonNow, 
@@ -159,6 +167,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
      console.log('new Stop by reset!')
      const newStop = await Stop.create(Stopquery);
      io.emit('stopUpdate',newStop);
+     return;
+    }
 
     
   }
@@ -207,6 +217,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
            console.log('new Stop by time!')
            const newStop = await Stop.create(Stopquery);
            io.emit('stopUpdate',newStop);
+           return;
         }
       }
     }
