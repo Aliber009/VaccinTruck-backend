@@ -180,8 +180,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       var addStop=true; 
       var NOW = new Date();
       NOW.setHours( NOW.getHours() + 1 );
-      var Now_delay = NOW;
-      var Now_delay = new Date(Now_delay.setMinutes(Now_delay.getMinutes() - 15))
+      var Now_delay = new Date();
+      Now_delay.setHours( Now_delay.getHours() + 1 );
+      Now_delay = new Date(Now_delay.setMinutes(Now_delay.getMinutes() - 15))
       //Now_delay.setHours( Now_delay.getHours() + 1 );
     //check Stop by time and position approx
       const pos = await Position.findAll({
