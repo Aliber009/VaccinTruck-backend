@@ -11,7 +11,7 @@ getAll:async function(req, res) {
 
     const TODAY_START = new Date().setHours(0, 1, 0, 0);
     var NOW = new Date();
-    NOW.setHours( NOW.getHours() + 1 );
+    //NOW.setHours( NOW.getHours() + 1 );
     try{
       const ambulances=await Ambulance.findAll();
       //get device last positions:
@@ -96,7 +96,7 @@ getbyId:async(req,res)=>{
 const id = req.query.id;
 const TODAY_START = new Date().setHours(0, 1, 0, 0);
 var NOW = new Date();
-NOW.setHours( NOW.getHours() + 1 );
+//NOW.setHours( NOW.getHours() + 1 );
 const ambulance = await Ambulance.findOne({ where: { id: id } });
 if(ambulance){
     //get last pos :

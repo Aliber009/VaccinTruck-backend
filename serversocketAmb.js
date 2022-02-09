@@ -101,7 +101,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   try{
   var TODAY_START = new Date().setHours(0, 1, 0, 0);
   var NOW = new Date();
-  NOW.setHours( NOW.getHours() + 1 );  
+  //NOW.setHours( NOW.getHours() + 1 );  
   var addStop=true
   //get all stops today
   const AmbulanceStopsToday = await ambulance.getStops({where: {
@@ -180,9 +180,9 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       var isStop=true; 
       var addStop=true;
       var NOW = new Date();
-      NOW.setHours( NOW.getHours() + 1 );
+      //NOW.setHours( NOW.getHours() + 1 );
       var Now_delay = new Date();
-      Now_delay.setHours( Now_delay.getHours() + 1 );
+      //Now_delay.setHours( Now_delay.getHours() + 1 );
       Now_delay = new Date(Now_delay.setMinutes(Now_delay.getMinutes() - 15))
       //Now_delay.setHours( Now_delay.getHours() + 1 );
     //check Stop by time and position approx

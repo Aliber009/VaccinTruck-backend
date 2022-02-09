@@ -10,7 +10,7 @@ const stopController = {
       try{
         const TODAY_START = new Date().setHours(0, 1, 0, 0);
         var NOW = new Date();
-        NOW.setHours( NOW.getHours() + 1 );
+        //NOW.setHours( NOW.getHours() + 1 );
         var totalVac=0;
         console.log('today,'+TODAY_START+"now: "+NOW)
         /* const DayTime=new Date();
@@ -38,7 +38,7 @@ const stopController = {
    deleteTodayStops:async(req,res)=>{
     const TODAY_START = new Date().setHours(0, 1, 0, 0);
     var NOW = new Date();
-    NOW.setHours( NOW.getHours() + 1 );
+    //NOW.setHours( NOW.getHours() + 1 );
     try{
       
     const Stops = await Stop.destroy({where:{
