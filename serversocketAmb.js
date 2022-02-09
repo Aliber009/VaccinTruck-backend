@@ -199,7 +199,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       if(pos.length>0)
       { 
       for( var p=0 ;p<pos.length;p++){
-        if(Math.abs(pos[p].lat-latNow)>0.002 || Math.abs(pos[p].lng-lonNow)>0.002 ){
+        if(Math.abs(pos[p].lat-latNow)>0.0003 || Math.abs(pos[p].lng-lonNow)>0.0003 ){
           isStop=false;
           break;
         }  
