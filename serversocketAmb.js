@@ -177,7 +177,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
     
   }
   else{
-      var addStop=true; 
+      var isStop=true; 
+      var addStop=true;
       var NOW = new Date();
       NOW.setHours( NOW.getHours() + 1 );
       var Now_delay = new Date();
@@ -198,22 +199,20 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       if(pos.length>0)
       { 
       for( var p=0 ;p<pos.length;p++){
-        if(Math.abs(pos[p].lat-latNow)>0.001 || Math.abs(pos[p].lng-lonNow)>0.001 ){
-          addStop=false;
+        if(Math.abs(pos[p].lat-latNow)>0.002 || Math.abs(pos[p].lng-lonNow)>0.002 ){
+          isStop=false;
           break;
         }  
       }
       }
-      if(addStop==true){
+      if(isStop==true){
         for(var i=0;i<AmbulanceStopsToday.length;i++){
-          if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.001 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.001)
+          if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.002)
           {
             addStop=false;
             break;
           }
         }
-      }
-      
         if( addStop == true){
           const Stopquery={
             lat:latNow,
@@ -227,6 +226,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
            io.emit('stopUpdate',newStop);
            return;
         }
+       }
       }
     }
  catch{
