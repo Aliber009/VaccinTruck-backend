@@ -99,7 +99,7 @@ app.get('/', (req, res) => {
 //Optimized function to check Stop:
 const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   try{
-  var TODAY_START = new Date().setHours(1, 0, 0, 0);
+  var TODAY_START = new Date().setHours(0, 1, 0, 0);
   var NOW = new Date();
   NOW.setHours( NOW.getHours() + 1 );  
   var addStop=true
@@ -190,8 +190,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       where:{ 
       AmbulanceId:ambulance.id,
       createdAt: {
-        [Op.gt]: NOW ,
-        [Op.lt]: Now_delay,
+        [Op.gt]: Now_delay,
+        [Op.lt]: NOW ,
       }},
       order: [['createdAt', 'DESC']],
       });

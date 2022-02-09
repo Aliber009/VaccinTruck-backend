@@ -7,7 +7,7 @@ const moment=require('moment');
 const PositionController={
   
  todayPosition:async (req,res)=>{
-    const TODAY_START = new Date().setHours(1, 0, 0, 0);
+    const TODAY_START = new Date().setHours(0, 1, 0, 0);
     var NOW = new Date();  
     NOW.setHours( NOW.getHours() + 1 );
     try{

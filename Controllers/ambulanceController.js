@@ -9,7 +9,7 @@ const geocode=require('../services/geocoder')
 const ambulanceController={
 getAll:async function(req, res) {
 
-    const TODAY_START = new Date().setHours(1, 0, 0, 0);
+    const TODAY_START = new Date().setHours(0, 1, 0, 0);
     var NOW = new Date();
     NOW.setHours( NOW.getHours() + 1 );
     try{
@@ -94,7 +94,7 @@ getAllbyDay:async function(req, res) {
 
 getbyId:async(req,res)=>{
 const id = req.query.id;
-const TODAY_START = new Date().setHours(1, 0, 0, 0);
+const TODAY_START = new Date().setHours(0, 1, 0, 0);
 var NOW = new Date();
 NOW.setHours( NOW.getHours() + 1 );
 const ambulance = await Ambulance.findOne({ where: { id: id } });
