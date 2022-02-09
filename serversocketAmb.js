@@ -99,8 +99,9 @@ app.get('/', (req, res) => {
 //Optimized function to check Stop:
 const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   try{
-  const TODAY_START = new Date().setHours(0, 0, 0, 0);
-  const NOW = new Date();  
+  var TODAY_START = new Date().setHours(1, 0, 0, 0);
+  var NOW = new Date();
+  NOW.setHours( NOW.getHours() + 1 );  
   var addStop=true
   //get all stops today
   const AmbulanceStopsToday = await ambulance.getStops({where: {
@@ -154,7 +155,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       {
         const newStop = await AmbulanceStopsToday[i].update({vaccinated:EventVaccinCount});
         addStopReset=false;
-        io.emit('stopUpdate',newStop);
+        
         
       }
     }
@@ -177,16 +178,19 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
   }
   else{
       var addStop=true; 
-      const NOW = new Date();
-      const Now_delay = new Date(NOW.setMinutes(NOW.getMinutes() - 10))
+      var NOW = new Date();
+      NOW.setHours( NOW.getHours() + 1 );
+      var Now_delay = NOW;
+      var Now_delay = new Date(Now_delay.setMinutes(Now_delay.getMinutes() - 15))
+      //Now_delay.setHours( Now_delay.getHours() + 1 );
     //check Stop by time and position approx
       const pos = await Position.findAll({
       attributes: ['lat' , 'lng'] ,
       where:{ 
       AmbulanceId:ambulance.id,
       createdAt: {
-        [Op.gt]: Now_delay ,
-        [Op.lt]:new Date() ,
+        [Op.gt]: NOW ,
+        [Op.lt]: Now_delay,
       }},
       order: [['createdAt', 'DESC']],
       });

@@ -7,8 +7,9 @@ const moment=require('moment');
 const PositionController={
   
  todayPosition:async (req,res)=>{
-    const TODAY_START = new Date().setHours(0, 0, 0, 0);
-    const NOW = new Date();  
+    const TODAY_START = new Date().setHours(1, 0, 0, 0);
+    var NOW = new Date();  
+    NOW.setHours( NOW.getHours() + 1 );
     try{
     const ambulances=await Ambulance.findAll();
     var Pos=[]
@@ -35,7 +36,8 @@ const PositionController={
   }   
  }, 
  testPos:(req,res) =>{
-  const NOW = new Date();
+  var NOW = new Date();
+  NOW.setHours( NOW.getHours() + 1 );
   const Now_delay = new Date(NOW.setMinutes(NOW.getMinutes() - 5))
   Position.findAll({
   attributes: ['lat' , 'lng','createdAt'] ,

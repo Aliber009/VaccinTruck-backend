@@ -8,8 +8,9 @@ const moment=require('moment');
 const stopController = {
    getStops:async (req,res)=>{
       try{
-        const TODAY_START = new Date().setHours(0, 0, 0, 0);
-        const NOW = new Date();
+        const TODAY_START = new Date().setHours(1, 0, 0, 0);
+        var NOW = new Date();
+        NOW.setHours( NOW.getHours() + 1 );
         var totalVac=0;
         console.log('today,'+TODAY_START+"now: "+NOW)
         /* const DayTime=new Date();
@@ -35,8 +36,9 @@ const stopController = {
      res.json({stop:stop})
    },
    deleteTodayStops:async(req,res)=>{
-    const TODAY_START = new Date().setHours(0, 0, 0, 0);
-    const NOW = new Date();
+    const TODAY_START = new Date().setHours(1, 0, 0, 0);
+    var NOW = new Date();
+    NOW.setHours( NOW.getHours() + 1 );
     try{
       
     const Stops = await Stop.destroy({where:{
