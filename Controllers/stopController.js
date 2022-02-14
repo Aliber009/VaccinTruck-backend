@@ -1,5 +1,5 @@
 const Stop = require('../models/stop');
-const {Op}=require('sequelize');
+const {Op, Sequelize}=require('sequelize');
 const Position = require('../models/position');
 const moment=require('moment');
 
@@ -29,10 +29,11 @@ const stopController = {
         res.json({success:false,msg:err})
       }
    },
-   increment:async(req,res)=>{
+   update:async(req,res)=>{
      const {stopId}=req.body;
      const stop = await Stop.findOne({where:{id:stopId}});
-     await stop.increment("vaccinated",{by:1});
+     stop.changed("updatedAt",true)
+     await stop.update({updatedAt:new Date()});
      res.json({stop:stop})
    },
    deleteTodayStops:async(req,res)=>{

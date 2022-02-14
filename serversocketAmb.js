@@ -185,7 +185,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
       //Now_delay.setHours( Now_delay.getHours() + 1 );
       Now_delay = new Date(Now_delay.setMinutes(Now_delay.getMinutes() - 20))
       //Now_delay.setHours( Now_delay.getHours() + 1 );
-    //check Stop by time and position approx
+     //check Stop by time and position approx
       const pos = await Position.findAll({
       attributes: ['lat' , 'lng'] ,
       where:{ 
@@ -209,6 +209,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         for(var i=0;i<AmbulanceStopsToday.length;i++){
           if(Math.abs(AmbulanceStopsToday[i].lat-latNow)<0.002 || Math.abs(AmbulanceStopsToday[i].lng-lonNow)<0.002)
           {
+            AmbulanceStopsToday[i].changed("updatedAt",true)
+            await AmbulanceStopsToday[i].update({updatedAt:new Date()});
             addStop=false;
             break;
           }
