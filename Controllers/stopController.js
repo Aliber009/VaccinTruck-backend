@@ -71,6 +71,7 @@ const stopController = {
         var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
         var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
         var diffTimeLocal = diffHrs+"h "+diffMins+"min"
+        var diffTimeHours = diffHrs + (diffMins/60)
         //var Stopelement={adress:rawStops[i].address,time:diffTimeLocal,vaccinated:rawStops[i].vaccinated}
         for(var j=i;j<rawStops.length;j++){
              if(rawStops[i].address==rawStops[j].address && i!=j){
@@ -81,10 +82,11 @@ const stopController = {
                    diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
                    diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
                    diffTimeLocal = diffHrs+"h "+diffMins+"min"
+                   diffTimeHours = diffHrs + (diffMins/60)
              }
         }
         if(duplicates.includes(rawStops[i].id)==false){
-        Stops.push({adress:rawStops[i].address,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
+        Stops.push({adress:rawStops[i].address,timeInhours:diffTimeHours,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
       }}
     
 
