@@ -50,6 +50,16 @@ const stopController = {
       res.json({stop:"deleted error"})
     }
    },
+   getStopsbyId:async(req,res)=>{
+     const {AmbulanceId}=req.body;
+     try{
+     const newStop=await Stop.findAll({where:{AmbulanceId:AmbulanceId},attributes:["address","vaccinated","createdAt","updatedAt"]});
+     res.json({success:true,stops:newStop})
+     }
+     catch{
+       res.json({success:false})
+     }
+    },
    create:async (req,res)=>{
     const { AmbulanceId,lat,lng,rtls,vaccinated,address } = req.body;
     const newStopQuery = {AmbulanceId:AmbulanceId,lat:lat,lng:lng,rtls:rtls,vaccinated:vaccinated,address:address} 
