@@ -52,12 +52,48 @@ const stopController = {
    },
    getStopsbyId:async(req,res)=>{
      const {AmbulanceId}=req.body;
+     const TODAY_START = new Date().setHours(0, 1, 0, 0);
+     var NOW = new Date();
+     var Stops=[];
+     var duplicates=[];
      try{
-     const newStop=await Stop.findAll({where:{AmbulanceId:AmbulanceId},attributes:["address","vaccinated","createdAt","updatedAt"]});
-     res.json({success:true,stops:newStop})
+     const rawStops=await Stop.findAll({where:{
+       AmbulanceId:AmbulanceId,
+       createdAt: { [Op.between]:[TODAY_START,NOW]}
+      },attributes:["id","address","vaccinated","createdAt","updatedAt"]});
+      
+      // get time difference :
+      for(var i=0;i<rawStops.length;i++){
+        var diffMs = rawStops[i].updatedAt - rawStops[i].createdAt;
+        var vacc =  rawStops[i].vaccinated;
+        var startDate = rawStops[i].createdAt;
+        var endDate = rawStops[i].updatedAt;
+        var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+        var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+        var diffTimeLocal = diffHrs+"h "+diffMins+"min"
+        //var Stopelement={adress:rawStops[i].address,time:diffTimeLocal,vaccinated:rawStops[i].vaccinated}
+        for(var j=i;j<rawStops.length;j++){
+             if(rawStops[i].address==rawStops[j].address && i!=j){
+                   duplicates.push(rawStops[j].id);
+                   vacc += rawStops[j].vaccinated;
+                   diffMs += rawStops[j].updatedAt - rawStops[j].createdAt ;
+                   endDate = rawStops[j].updatedAt
+                   diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+                   diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+                   diffTimeLocal = diffHrs+"h "+diffMins+"min"
+             }
+        }
+        if(duplicates.includes(rawStops[i].id)==false){
+        Stops.push({adress:rawStops[i].address,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
+      }}
+    
+
+
+     res.json({success:true,stops:Stops})
      }
-     catch{
-       res.json({success:false})
+     catch(err){
+       console.log(err)
+       res.json({success:err})
      }
     },
    create:async (req,res)=>{
