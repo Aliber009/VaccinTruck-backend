@@ -68,6 +68,9 @@ const stopController = {
         var diffMs = rawStops[i].updatedAt - rawStops[i].createdAt;
         var vacc =  rawStops[i].vaccinated;
         var startDate = rawStops[i].createdAt;
+        if(vacc==0){
+        startDate = new Date(startDate.setMinutes(startDate.getMinutes() - 20)).toISOString();
+        }
         var endDate = rawStops[i].updatedAt;
         var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
         var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
