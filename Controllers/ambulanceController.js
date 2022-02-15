@@ -109,16 +109,47 @@ if(ambulance){
       });
       const address=await geocode(LastPos.lat,LastPos.lng);
       //get Stops of ambulance:
-      const ambulanceStop=await ambulance.getStops(
+      const rawStops=await ambulance.getStops(
         {where:{
              createdAt: { 
                  [Op.gt]: TODAY_START,
                  [Op.lt]: NOW
                },
         }});
+        var Stops=[];
+        var duplicates=[];
+        // get time difference :
+      for(var i=0;i<rawStops.length;i++){ 
+        var vacc =  rawStops[i].vaccinated;
+        var startDate = rawStops[i].createdAt;
+        if(vacc==0){
+        startDate = new Date(startDate.setMinutes(startDate.getMinutes() - 20));
+        }
+        var diffMs = new Date(rawStops[i].updatedAt) - startDate;
+        var endDate = new Date(rawStops[i].updatedAt);
+        var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+        var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+        var diffTimeLocal = diffHrs+"h "+diffMins+"min"
+        var diffTimeHours = diffHrs + (diffMins/60)
+        //var Stopelement={adress:rawStops[i].address,time:diffTimeLocal,vaccinated:rawStops[i].vaccinated}
+        for(var j=i;j<rawStops.length;j++){
+             if(rawStops[i].address==rawStops[j].address && i!=j){
+                   duplicates.push(rawStops[j].id);
+                   vacc += rawStops[j].vaccinated;
+                   diffMs += new Date(rawStops[j].updatedAt)- new Date(rawStops[j].createdAt) ;
+                   endDate = new Date(rawStops[j].updatedAt)
+                   diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+                   diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+                   diffTimeLocal = diffHrs+"h "+diffMins+"min"
+                   diffTimeHours = diffHrs + (diffMins/60)
+             }
+        }
+        if(duplicates.includes(rawStops[i].id)==false){
+        Stops.push({adress:rawStops[i].address,timeInhours:diffTimeHours,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
+      }}
     
       
-    res.json({ambulance:ambulance,TotalVaccinGlobal:ambulance.vaccinCountTotal,TotalVaccin:ambulance.vaccinCount,lastpos:{...LastPos.dataValues,address:address},stops:ambulanceStop})
+    res.json({ambulance:ambulance,TotalVaccinGlobal:ambulance.vaccinCountTotal,TotalVaccin:ambulance.vaccinCount,lastpos:{...LastPos.dataValues,address:address},stops:Stops})
 }
 
 },
