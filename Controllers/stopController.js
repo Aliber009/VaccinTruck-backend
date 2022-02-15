@@ -64,13 +64,13 @@ const stopController = {
       },attributes:["id","address","vaccinated","createdAt","updatedAt"]});
       
       // get time difference :
-      for(var i=0;i<rawStops.length;i++){
-        var diffMs = rawStops[i].updatedAt - rawStops[i].createdAt;
+      for(var i=0;i<rawStops.length;i++){ 
         var vacc =  rawStops[i].vaccinated;
         var startDate = rawStops[i].createdAt;
         if(vacc==0){
         startDate = new Date(startDate.setMinutes(startDate.getMinutes() - 20)).toISOString();
         }
+        var diffMs = rawStops[i].updatedAt - startDate;
         var endDate = rawStops[i].updatedAt;
         var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
         var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
