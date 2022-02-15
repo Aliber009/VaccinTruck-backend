@@ -68,10 +68,10 @@ const stopController = {
         var vacc =  rawStops[i].vaccinated;
         var startDate = rawStops[i].createdAt;
         if(vacc==0){
-        startDate = new Date(startDate.setMinutes(startDate.getMinutes() - 20)).toISOString();
+        startDate = new Date(startDate.setMinutes(startDate.getMinutes() - 20));
         }
-        var diffMs = rawStops[i].updatedAt - startDate;
-        var endDate = rawStops[i].updatedAt;
+        var diffMs = new Date(rawStops[i].updatedAt) - startDate;
+        var endDate = new Date(rawStops[i].updatedAt);
         var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
         var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
         var diffTimeLocal = diffHrs+"h "+diffMins+"min"
@@ -81,8 +81,8 @@ const stopController = {
              if(rawStops[i].address==rawStops[j].address && i!=j){
                    duplicates.push(rawStops[j].id);
                    vacc += rawStops[j].vaccinated;
-                   diffMs += rawStops[j].updatedAt - rawStops[j].createdAt ;
-                   endDate = rawStops[j].updatedAt
+                   diffMs += new Date(rawStops[j].updatedAt)- new Date(rawStops[j].createdAt) ;
+                   endDate = new Date(rawStops[j].updatedAt)
                    diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
                    diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
                    diffTimeLocal = diffHrs+"h "+diffMins+"min"
