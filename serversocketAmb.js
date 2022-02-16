@@ -248,7 +248,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
          const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
         //Here we are sending the positions only
-       if(ambulance.id!=5){
+       if(ambulance.name!="Bouskoura"){
         var queries = {} 
          const gpsTime = new Date().toISOString();
          const lastPositionInQueue = Position.findOne({where:{AmbulanceId:ambulance.id},order: [['createdAt', 'DESC']]});
@@ -282,7 +282,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
        checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)
        }
        else{
-         console.log("bouskouuuura")
+        
         const gpsTimeFixed = new Date();
         const queries = {
         lat:"33.465917",
