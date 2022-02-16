@@ -245,12 +245,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         //get the message header 
          const serial = msg.properties.headers.serial
          const jsonmsg=JSON.parse(msg.content.toString())
-         
-         if(jsonmsg.gpsPayload.latitude && jsonmsg.gpsPayload.longitude ){
-        const ambulance=await Ambulance.findOne({where:{imei:serial}})
+         const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
         //Here we are sending the positions only
-      if(ambulance.id!=5){
+       if(ambulance.id!=5){
         var queries = {} 
          const gpsTime = new Date().toISOString();
          const lastPositionInQueue = Position.findOne({where:{AmbulanceId:ambulance.id},order: [['createdAt', 'DESC']]});
@@ -284,6 +282,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
        checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)
        }
        else{
+         console.log("bouskouuuura")
         const gpsTimeFixed = new Date();
         const queries = {
         lat:"33.465917",
@@ -301,6 +300,7 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
        }
       }
       else{
+        console.log("serial is",serial)
    const arrayData=[
      {name:"Oulad azzouz",serial:"124158189232209108",immatricule:"225356j"},
      {name:"Bouskoura",serial:"761717416365196",immatricule:"190162j"},
@@ -320,11 +320,11 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         }
       }  
       }
-    }
+    
         setTimeout(function() {
           console.log(" [x] Done");
           channel.ack(msg);
-        }, 50);
+        }, 5);
     }, {
     noAck: false
   });
