@@ -248,8 +248,10 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
          const ambulance=await Ambulance.findOne({where:{imei:serial}})
         if(ambulance){
         //Here we are sending the positions only
-       if(ambulance.name!="Bouskoura"){
-        var queries = {} 
+        
+        if(ambulance.name!="Bouskoura"){
+          if(jsonmsg.gpsPayload.latitude && jsonmsg.gpsPayload.longitude){
+         var queries = {} 
          const gpsTime = new Date().toISOString();
          const lastPositionInQueue = Position.findOne({where:{AmbulanceId:ambulance.id},order: [['createdAt', 'DESC']]});
         if(Math.abs(jsonmsg.gpsPayload.latitude-lastPositionInQueue.lat)<0.0002 || Math.abs(jsonmsg.gpsPayload.longitude-lastPositionInQueue.lng)<0.0002)
@@ -281,6 +283,8 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         //Here we are sending the Stop Mark! by checking the stop first 
        checkStop(ambulance,jsonmsg.gpsPayload.latitude,jsonmsg.gpsPayload.longitude,jsonmsg.vaccin_count)
        }
+      }
+    
        else{
         
         const gpsTimeFixed = new Date();
@@ -296,12 +300,13 @@ const checkStop = async (ambulance,latNow,lonNow,EventVaccinCount)=>{
         //send pos and additional data only if the user has it
          io.emit('positionUpdate',pos);
         //Here we are sending the Stop Mark! by checking the stop first 
-       checkStop(ambulance,"33.465917","-7.645524",jsonmsg.vaccin_count)
+        checkStop(ambulance,"33.465917","-7.645524",jsonmsg.vaccin_count)
+        }
        }
-      }
+      
       else{
-        console.log("serial is",serial)
-   const arrayData=[
+        
+     const arrayData=[
      {name:"Oulad azzouz",serial:"124158189232209108",immatricule:"225356j"},
      {name:"Bouskoura",serial:"761717416365196",immatricule:"190162j"},
      {name:"Nouaceur",serial:"12415818925449220",immatricule:"219852j"},
