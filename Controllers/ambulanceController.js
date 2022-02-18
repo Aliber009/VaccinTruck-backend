@@ -145,6 +145,11 @@ if(ambulance){
              }
         }
         if(duplicates.includes(rawStops[i].id)==false){
+          if( diffTimeHours == 0 && vacc > 0){
+               var correctedTime = (vacc*1.5)/60
+               startDate  =new Date(startDate.setMinutes(startDate.getMinutes() - correctedTime ));
+               diffTimeHours = correctedTime
+          }
         Stops.push({adress:rawStops[i].address,timeInhours:diffTimeHours,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
       }}
     
