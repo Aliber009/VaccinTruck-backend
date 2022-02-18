@@ -145,10 +145,11 @@ if(ambulance){
              }
         }
         if(duplicates.includes(rawStops[i].id)==false){
-          if( diffTimeHours == 0 && vacc > 0){
+          if( diffTimeHours == "0" && vacc > 0){
                var correctedTime = (vacc*2)/60
-               startDate  =new Date(startDate.setMinutes(startDate.getMinutes() - correctedTime ));
+               startDate  = new Date(startDate.setMinutes(startDate.getMinutes() - correctedTime ));
                diffTimeHours = correctedTime
+               diffTimeLocal = parseInt(correctedTime)+"h "+ (correctedTime - parseInt(correctedTime))*60 + "min"
           }
         Stops.push({adress:rawStops[i].address,timeInhours:diffTimeHours,time:diffTimeLocal,vaccinated:vacc, startDate:startDate,endDate:endDate});
       }}
