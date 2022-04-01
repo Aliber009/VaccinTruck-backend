@@ -4,7 +4,7 @@ const eventEmitter = new EventEmitter()
 //connect to rabbit
 var amqp = require('amqplib/callback_api');
 
-const connection = amqp.connect('amqp://ali:ali@35.223.192.9:5672', function(error0, connection) {
+const connection = amqp.connect('', function(error0, connection) {
   if (error0) {
     throw error0;
   }
